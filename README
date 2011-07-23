@@ -1,0 +1,32 @@
+This is a prototype of a REST abstraction of MogileFS.
+
+Rationale: mogilefs client implementation is a bit complicated (requires
+handling of propriatary mogile network protocol, correct management of
+data to be transfered etc.).
+
+This is based on Dancer (perldancer.org)
+
+Installation instructions:
+--------------------------
+
+$ git clone git@github.com/yannk/MogileFS-REST.git
+$ cpanm MogileFS-REST
+
+Configuration Instructions:
+---------------------------
+
+servers:
+    - host1:7001
+    - host2:7001
+class: yourclass    # as declared on mogile
+domain: yourdomain
+
+Usage Instructions:
+-------------------
+
+$ perl app.psgi
+# replace README with anyfile
+$ curl -i -X PUT --data-binary @README http://localhost:3000/testing/key";
+$ curl -i -X GET http://localhost:3000/testing/key";
+$ curl -i -X HEAD http://localhost:3000/testing/key";
+$ curl -i -X DELETE http://localhost:3000/testing/key";

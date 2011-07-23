@@ -1,0 +1,19 @@
+# configuration file for development environment
+
+# the logger engine to use
+# console: log messages to STDOUT (your console where you started the
+#          application server)
+# file:    log message to a file in log/
+logger: "console"
+# core is the lowest, it shows Dancer's core log messages as well as yours
+# (debug, warning and error)
+log: "core"
+warnings: 1
+show_errors: 1
+auto_reload: 0
+
+servers:
+    - host1:7001
+    - host2:7001
+class: yourclass
+domain: yourdomain
