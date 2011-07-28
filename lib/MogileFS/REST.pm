@@ -40,13 +40,19 @@ get '/:namespace/:key' => sub {
     my $mogile_key = join ":", $namespace, $key;
     my @paths = $client->get_paths($mogile_key, { no_verify => 1 });
     return _not_found() unless @paths;
-    status(200);
     header('X-Reproxy-URL' => join " ", @paths);
-    header('Content-Type' => 'application/octet-stream');
-    ## should we do another request to get x-reproxy-expected-size
-    return ''if $req->is_head;
-    my $dataref = $client->get_file_data($mogile_key);
-    return $$dataref;
+    if ($can_reproxy) {
+        status(HTTP_NO_CONTENT);
+        return '';
+    }
+    else {
+        status(HTTP_OK);
+        header('Content-Type' => 'application/octet-stream');
+        ## should we do another request to get x-reproxy-expected-size
+        return ''if $req->is_head;
+        my $dataref = $client->get_file_data($mogile_key);
+        return $$dataref;
+    }
 };
 
 del '/:namespace/:key' => sub {
