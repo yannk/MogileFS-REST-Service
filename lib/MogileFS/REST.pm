@@ -22,7 +22,7 @@ a MogileFS client in different languages.
 Files are hosted at:
 /:namespace/:key
 
-you can HEAD/GET/PUT/DELETE on that endpoint
+you can HEAD/GET/PUT/DELETE on that endpoint, please README for more details.
 
 EOA
 
