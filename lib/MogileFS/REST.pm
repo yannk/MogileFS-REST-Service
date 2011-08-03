@@ -3,6 +3,7 @@ use Dancer ':syntax';
 use Carp;
 use HTTP::Status ':constants';
 use MogileFS::Client;
+use Data::Dumper;
 
 our $VERSION = '0.1';
 
