@@ -7,10 +7,10 @@ use MogileFS::Client;
 our $VERSION = '0.1';
 
 my $client = MogileFS::Client->new(
-    domain => config->{domain},
-    hosts  => config->{servers},
+    domain => $ENV{MOGILEFS_REST_DOMAIN} || config->{domain},
+    hosts  => $ENV{MOGILEFS_REST_SERVERS} || config->{servers},
 );
-my $mogclass = config->{class};
+my $mogclass = $ENV{MOGILEFS_REST_CLASS} || config->{class};
 
 get '/' => sub {
     header('Content-Type' => 'text/plain');
