@@ -20,7 +20,7 @@ my $client = MogileFS::Client->new(
     hosts  => $mogservers,
 );
 
-debug("Mogile configuration: " . Dumper [$mogservers, $mogdomain, $mogclass]);
+debug("Mogile config: " . (Dumper [$mogservers, $mogdomain, $mogclass]));
 
 get '/' => sub {
     header('Content-Type' => 'text/plain');
