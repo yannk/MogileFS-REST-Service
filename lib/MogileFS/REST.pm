@@ -6,15 +6,20 @@ use MogileFS::Client;
 
 our $VERSION = '0.1';
 
-my $env_servers;
+my $mogservers;
 if (my $cnf = $ENV{MOGILEFS_REST_SERVERS}) {
-    $env_servers = [  split /,/, $cnf ];
+    $mogservers = [  split /,/, $cnf ];
 }
-my $client = MogileFS::Client->new(
-    domain => $ENV{MOGILEFS_REST_DOMAIN} || config->{domain},
-    hosts  => $env_servers || config->{servers},
-);
+$mogservers ||= config->{servers};
+my $mogdomain = $ENV{MOGILEFS_REST_DOMAIN} || config->{domain};
 my $mogclass = $ENV{MOGILEFS_REST_CLASS} || config->{class};
+
+my $client = MogileFS::Client->new(
+    domain => $mogdomain,
+    hosts  => $mogservers,
+);
+
+debug("Mogile configuration: " . Dumper [$mogservers, $mogdomain, $mogclass]);
 
 get '/' => sub {
     header('Content-Type' => 'text/plain');
