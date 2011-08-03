@@ -6,9 +6,13 @@ use MogileFS::Client;
 
 our $VERSION = '0.1';
 
+my $env_servers;
+if (my $cnf = $ENV{MOGILEFS_REST_SERVERS}) {
+    $env_servers = [  split /,/, $cnf ];
+}
 my $client = MogileFS::Client->new(
     domain => $ENV{MOGILEFS_REST_DOMAIN} || config->{domain},
-    hosts  => $ENV{MOGILEFS_REST_SERVERS} || config->{servers},
+    hosts  => $env_servers || config->{servers},
 );
 my $mogclass = $ENV{MOGILEFS_REST_CLASS} || config->{class};
 
