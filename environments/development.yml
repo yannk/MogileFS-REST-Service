@@ -13,7 +13,7 @@ show_errors: 1
 auto_reload: 0
 
 servers:
-    - host1:7001
-    - host2:7001
+    - localhost:7001
+    - localhost:7002
 class: yourclass
 domain: yourdomain
