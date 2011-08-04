@@ -61,6 +61,7 @@ get '/:namespace/:key' => sub {
         ## should we do another request to get x-reproxy-expected-size
         if ($req->is_head) {
             debug("request is HEAD, returning no content");
+            header('Content-Length', 0);
             return '';
         }
         my $dataref = $client->get_file_data($mogile_key);
