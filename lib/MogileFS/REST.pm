@@ -95,8 +95,15 @@ put '/:namespace/:key' => sub {
     }
     my $opts = { bytes => $size };
     my $rv = $client->store_content($mogile_key, $mogclass, $dataref, $opts);
-    status(HTTP_CREATED);
-    return '';
+    if ($rv) {
+        status(HTTP_CREATED);
+        return '';
+    }
+    else {
+        my $errstr = $client->errstr;
+        error("Error is $errstr");
+        return _error("Couln't save this key");
+    }
 };
 
 sub _not_found {
