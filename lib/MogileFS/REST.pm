@@ -59,7 +59,10 @@ get '/:namespace/:key' => sub {
         status(HTTP_OK);
         header('Content-Type' => 'application/octet-stream');
         ## should we do another request to get x-reproxy-expected-size
-        return ''if $req->is_head;
+        if ($req->is_head) {
+            debug("request is HEAD, returning no content");
+            return '';
+        }
         my $dataref = $client->get_file_data($mogile_key);
         return $$dataref;
     }
