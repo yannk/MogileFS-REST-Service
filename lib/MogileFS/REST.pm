@@ -5,22 +5,25 @@ use HTTP::Status ':constants';
 use MogileFS::Client;
 use Data::Dumper;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 my $mogservers;
 if (my $cnf = $ENV{MOGILEFS_REST_SERVERS}) {
     $mogservers = [  split /,/, $cnf ];
 }
 $mogservers ||= config->{servers};
-my $mogdomain = $ENV{MOGILEFS_REST_DOMAIN} || config->{domain};
-my $mogclass = $ENV{MOGILEFS_REST_CLASS} || config->{class};
+my $default_mogclass = $ENV{MOGILEFS_REST_DEFAULT_CLASS} || "normal";
 
-my $client = MogileFS::Client->new(
-    domain => $mogdomain,
-    hosts  => $mogservers,
-);
+sub get_client {
+    my ($domain) = @_;
+    my $client = MogileFS::Client->new(
+        domain => $domain,
+        hosts  => $mogservers,
+    );
+    return $client;
+}
 
-debug("Mogile config: " . (Dumper [$mogservers, $mogdomain, $mogclass]));
+debug("Mogile config: " . (Dumper [$mogservers]));
 
 get '/' => sub {
     header('Content-Type' => 'text/plain');
@@ -47,7 +50,8 @@ get '/:namespace/:key' => sub {
     if ($capabilities && $capabilities =~ m{\breproxy-file\b}i) {
         $can_reproxy = 1;
     }
-    my $mogile_key = join ":", $namespace, $key;
+    my $mogile_key = $key;
+    my $client = get_client($namespace);
     my @paths = $client->get_paths($mogile_key, { no_verify => 1 });
     return _not_found() unless @paths;
     header('X-Reproxy-URL' => join " ", @paths);
@@ -72,9 +76,10 @@ get '/:namespace/:key' => sub {
 del '/:namespace/:key' => sub {
     my $namespace = param('namespace');
     my $key = param('key');
-    my $mogile_key = join ":", $namespace, $key;
+    my $mogile_key = $key;
     my $req = request;
 
+    my $client = get_client($namespace);
     my $rv = $client->delete($mogile_key);
     return _error("Couldn't delete $namespace/$key") unless $rv;
     status(HTTP_NO_CONTENT);
@@ -84,9 +89,10 @@ del '/:namespace/:key' => sub {
 put '/:namespace/:key' => sub {
     my $namespace = param('namespace');
     my $key = param('key');
-    my $mogile_key = join ":", $namespace, $key;
+    my $mogile_key = $key;
 
     my $req = request;
+    my $mogclass = $req->header('X-MogileFS-Class') || $default_mogclass;
     my $dataref = \request->body;
 
     my $size;
@@ -95,6 +101,7 @@ put '/:namespace/:key' => sub {
         $size = bytes::length($$dataref);
     }
     my $opts = { bytes => $size };
+    my $client = get_client($namespace);
     my $rv = $client->store_content($mogile_key, $mogclass, $dataref, $opts);
     if ($rv) {
         status(HTTP_CREATED);
@@ -103,7 +110,7 @@ put '/:namespace/:key' => sub {
     else {
         my $errstr = $client->errstr;
         error("Error is $errstr");
-        return _error("Couln't save this key");
+        return _error("Sorry, couln't save this key");
     }
 };
 
