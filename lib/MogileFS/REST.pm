@@ -81,7 +81,8 @@ del '/:domain/:key' => sub {
 
     my $client = get_client($domain);
     my $rv = $client->delete($mogile_key);
-    return _error("Couldn't delete $domain/$key") unless $rv;
+    my $e = $client->errstr;
+    return _error("Couldn't delete $domain/$mogile_key: $e") unless $rv;
     status(HTTP_NO_CONTENT);
     return '';
 };
@@ -110,7 +111,7 @@ put '/:domain/:key' => sub {
     else {
         my $errstr = $client->errstr;
         error("Error is $errstr");
-        return _error("Sorry, couln't save this key");
+        return _error("Couln't save this key: $errstr");
     }
 };
 
