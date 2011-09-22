@@ -121,6 +121,7 @@ sub _not_found {
 }
 
 sub _error {
+    header('Content-Type' => 'text/plain');
     status(HTTP_INTERNAL_SERVER_ERROR);
     return $_[0] || "Server Error"
 }
