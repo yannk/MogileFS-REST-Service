@@ -33,7 +33,7 @@ we can store and retrieve files from mogile, without having to reimplement
 a MogileFS client in different languages.
 
 Files are hosted at:
-/:namespace/:key
+/:domain/:key
 
 you can HEAD/GET/PUT/DELETE on that endpoint, please README for more details.
 
@@ -41,8 +41,8 @@ EOA
 
 };
 
-get '/:namespace/:key' => sub {
-    my $namespace = param('namespace');
+get '/:domain/:key' => sub {
+    my $domain = param('domain');
     my $key = param('key');
     my $req = request;
     my $can_reproxy = 0;
@@ -51,7 +51,7 @@ get '/:namespace/:key' => sub {
         $can_reproxy = 1;
     }
     my $mogile_key = $key;
-    my $client = get_client($namespace);
+    my $client = get_client($domain);
     my @paths = $client->get_paths($mogile_key, { no_verify => 1 });
     return _not_found() unless @paths;
     header('X-Reproxy-URL' => join " ", @paths);
@@ -73,21 +73,21 @@ get '/:namespace/:key' => sub {
     }
 };
 
-del '/:namespace/:key' => sub {
-    my $namespace = param('namespace');
+del '/:domain/:key' => sub {
+    my $domain = param('domain');
     my $key = param('key');
     my $mogile_key = $key;
     my $req = request;
 
-    my $client = get_client($namespace);
+    my $client = get_client($domain);
     my $rv = $client->delete($mogile_key);
-    return _error("Couldn't delete $namespace/$key") unless $rv;
+    return _error("Couldn't delete $domain/$key") unless $rv;
     status(HTTP_NO_CONTENT);
     return '';
 };
 
-put '/:namespace/:key' => sub {
-    my $namespace = param('namespace');
+put '/:domain/:key' => sub {
+    my $domain = param('domain');
     my $key = param('key');
     my $mogile_key = $key;
 
@@ -101,7 +101,7 @@ put '/:namespace/:key' => sub {
         $size = bytes::length($$dataref);
     }
     my $opts = { bytes => $size };
-    my $client = get_client($namespace);
+    my $client = get_client($domain);
     my $rv = $client->store_content($mogile_key, $mogclass, $dataref, $opts);
     if ($rv) {
         status(HTTP_CREATED);
