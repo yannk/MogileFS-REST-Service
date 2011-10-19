@@ -111,7 +111,7 @@ put '/:domain/:key' => sub {
     else {
         my $errstr = $client->errstr;
         error("Error is $errstr");
-        return _error("Couldn't save this key: $errstr");
+        return _error("Couldn't save key '$domain/$mogile_key': $errstr");
     }
 };
 
