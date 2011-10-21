@@ -149,7 +149,9 @@ sub put {
     my $client = $app->get_client($domain);
     my $rv = $client->store_file($key, $mogclass, $data_handle, $opts);
     if (defined $rv) {
-        return $req->new_response(HTTP_CREATED);
+        my $res = $req->new_response(HTTP_CREATED);
+        $res->header( Location => $req->uri );
+        return $res;
     }
     else {
         my $errstr = $client->errstr;
