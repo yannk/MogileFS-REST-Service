@@ -55,7 +55,7 @@ sub run {
             $res = $app->put($req);
         }
         else {
-            $res = $app->not_found($req);
+            $res = $app->respond_not_found($req);
         }
         return $res->finalize;
     };
@@ -99,7 +99,7 @@ sub get {
     }
     my $client = $app->get_client($domain);
     my @paths = $client->get_paths($key, { no_verify => 1 });
-    return $app->not_found($req) unless @paths;
+    return $app->respond_not_found($req) unless @paths;
     my $res = $req->new_response(HTTP_OK);
     $res->header('X-Reproxy-URL' => join " ", @paths);
     if ($can_reproxy) {
@@ -130,7 +130,8 @@ sub delete {
     my $client = $app->get_client($domain);
     my $rv = $client->delete($key);
     my $e = $client->errstr;
-    return $app->error("Couldn't delete $domain/$key: $e") unless $rv;
+    return $app->respond_error($req, "Couldn't delete $domain/$key: $e")
+        unless $rv;
     my $res = $req->new_response(HTTP_NO_CONTENT);
     return $res;
 }
@@ -152,12 +153,13 @@ sub put {
     }
     else {
         my $errstr = $client->errstr;
-        $app->error("Error is $errstr");
-        return $app->error("Couldn't save key '$domain/$key': $errstr");
+        my $err = "Can't save key '$domain/$key': $errstr";
+        $app->error($err);
+        return $app->respond_error($req, $err);
     }
 }
 
-sub not_found {
+sub respond_not_found {
     my ($app, $req) = @_;
     my $res = $req->new_response(HTTP_NOT_FOUND);
     $res->content_type('text/plain');
@@ -165,7 +167,7 @@ sub not_found {
     return $res;
 }
 
-sub error {
+sub respond_error {
     my ($app, $req, $error) = @_;
     my $res = $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
     $res->content_type('text/plain');
