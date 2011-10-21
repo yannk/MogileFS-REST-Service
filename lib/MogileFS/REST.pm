@@ -148,7 +148,7 @@ sub put {
     my $data_handle = $req->input;
     my $client = $app->get_client($domain);
     my $rv = $client->store_file($key, $mogclass, $data_handle, $opts);
-    if ($rv) {
+    if (defined $rv) {
         return $req->new_response(HTTP_CREATED);
     }
     else {
