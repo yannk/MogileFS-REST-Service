@@ -14,7 +14,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More'  => 0,
         'YAML'        => 0,
-        'Dancer'      => 1.3070,
+        'Plack'       => 0,
         'MogileFS::Client' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -1,4 +1,24 @@
 #!/usr/bin/env perl
-use Dancer;
+
+use strict;
 use MogileFS::REST;
-dance;
+
+## get the configuration for this app
+my $servers;
+if (my $cnf = $ENV{MOGILEFS_REST_SERVERS}) {
+    $servers = [  split /,/, $cnf ];
+}
+my $default_class = $ENV{MOGILEFS_REST_DEFAULT_CLASS} || "normal";
+my $largefile = defined $ENV{MOGILEFS_REST_LARGEFILE}
+              ? $ENV{MOGILEFS_REST_LARGEFILE}
+              : 1;
+
+## instantiate a new app
+my $app = MogileFS::REST->new(
+    servers => $servers,
+    default_class => $default_class,
+    largefile => $largefile,
+);
+
+## psgi run it
+$app->run();
