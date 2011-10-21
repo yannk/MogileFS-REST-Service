@@ -11,7 +11,7 @@ if (my $cnf = $ENV{MOGILEFS_REST_SERVERS}) {
 my $default_class = $ENV{MOGILEFS_REST_DEFAULT_CLASS} || "normal";
 my $largefile = defined $ENV{MOGILEFS_REST_LARGEFILE}
               ? $ENV{MOGILEFS_REST_LARGEFILE}
-              : 1;
+              : 0;
 
 ## instantiate a new app
 my $app = MogileFS::REST->new(
