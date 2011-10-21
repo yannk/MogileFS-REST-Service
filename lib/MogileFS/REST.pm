@@ -117,8 +117,8 @@ sub get {
         $res->header('Content-Length', 0);
         return $res;
     }
-    my $dataref = $client->get_file_data($key);
-    $res->body($$dataref); ## TODO fix me to pass down an handle
+    my $handle = $client->read_file($key);
+    $res->body($handle);
     return $res;
 }
 
