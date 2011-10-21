@@ -4,8 +4,6 @@ Rationale: mogilefs client implementation is a bit complicated (requires
 handling of propriatary mogile network protocol, correct management of
 data to be transfered etc.).
 
-This is based on Dancer (perldancer.org)
-
 Installation instructions:
 --------------------------
 
@@ -15,18 +13,20 @@ $ cpanm MogileFS-REST
 Configuration Instructions:
 ---------------------------
 
-servers:
-    - host1:7001
-    - host2:7001
-class: yourclass    # as declared on mogile
-domain: yourdomain
+You can either use the provided app.psgi using ENV variable to configure it,
+or write your own app.psgi.
+
+ENV variables are:
+- MOGILEFS_REST_SERVERS         comma separated list of trackers
+- MOGILEFS_REST_DEFAULT_CLASS   default mogile class to use if none specified in the req.
+- MOGILEFS_REST_LARGEFILE:      use largefile support of mogile client. default to true.
 
 Usage Instructions:
 -------------------
 
-$ perl app.psgi
+$ MOGILEFS_REST_SERVERS=localhost:7001 plackup -Ilib -a app.psgi
 # replace README with anyfile
-$ curl -i -X PUT --data-binary @README http://localhost:3000/testing/key
-$ curl -i -X GET http://localhost:3000/testing/key
-$ curl -i -X HEAD http://localhost:3000/testing/key
-$ curl -i -X DELETE http://localhost:3000/testing/key
+$ curl -i -X PUT --data-binary @README http://localhost:5000/testing/key
+$ curl -i -X GET http://localhost:5000/testing/key
+$ curl -i -X HEAD http://localhost:5000/testing/key
+$ curl -i -X DELETE http://localhost:5000/testing/key
