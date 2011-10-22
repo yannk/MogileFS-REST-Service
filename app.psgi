@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
+use lib 'lib';
 use MogileFS::REST;
 
 ## get the configuration for this app
