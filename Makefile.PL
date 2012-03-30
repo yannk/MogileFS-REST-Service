@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'Blob',
+    NAME                => 'MogileFS-REST',
     AUTHOR              => q{Yann Kerherve <yann@saymedia.com>},
     VERSION_FROM        => 'lib/MogileFS/REST.pm',
     ABSTRACT            => 'Prototype of MogileFS REST wrapper',
@@ -18,5 +18,5 @@ WriteMakefile(
         'MogileFS::Client' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Blob-*' },
+    clean               => { FILES => 'MogileFS-REST-*' },
 );
