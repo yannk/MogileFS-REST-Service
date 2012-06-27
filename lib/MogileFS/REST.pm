@@ -1,4 +1,6 @@
 package MogileFS::REST;
+use strict;
+use warnings;
 use Carp;
 use HTTP::Status ':constants';
 use MogileFS::Client;
@@ -82,7 +84,9 @@ a MogileFS client in different languages.
 Files are hosted at:
 /:domain/:key
 
-you can HEAD/GET/PUT/DELETE on that endpoint, please README for more details.
+* you can GET/PUT/DELETE on those resources, please README for more details.
+* GET /:domain/:key?paths returns the network paths to the storage node for
+  that file. (one per line)
 
 EOA
     return $res;
@@ -91,18 +95,22 @@ EOA
 sub get {
     my ($app, $req) = @_;
     my ($domain, $key) = split_path($req->path);
-    $app->debug("getting: $domain:$key");
+    $app->debug("Getting: $domain:$key");
+
+    my $p = $req->query_parameters;
+    if (exists $p->{paths}) {
+        return $app->get_paths($req, $domain, $key);
+    }
     my $can_reproxy = 0;
     my $capabilities = $req->header('X-Proxy-Capabilities');
     if ($capabilities && $capabilities =~ m{\breproxy-file\b}i) {
         $can_reproxy = 1;
     }
     my $client = $app->get_client($domain);
-    my @paths = $client->get_paths($key, { no_verify => 1 });
-    return $app->respond_not_found($req) unless @paths;
     my $res = $req->new_response(HTTP_OK);
-    $res->header('X-Reproxy-URL' => join " ", @paths);
     if ($can_reproxy) {
+        my @paths = $client->get_paths($key, { no_verify => 1 });
+        $res->header('X-Reproxy-URL' => join " ", @paths);
         ## we can reproxy, so just send headers without any body
         $app->debug("reproxying to " . $res->header('X-Reproxy-URL'));
         $res->status(HTTP_NO_CONTENT);
@@ -111,14 +119,37 @@ sub get {
 
     $res->header('Content-Type' => 'application/octet-stream');
 
-    ## should we do another request to get x-reproxy-expected-size?
     if ($req->method eq 'HEAD') {
+        ## deprecated. backward compat only
+        my @paths = $client->get_paths($key, { no_verify => 1 });
+        unless (@paths) {
+            return $req->new_response(HTTP_NOT_FOUND);
+        }
+        $res->header('X-Reproxy-URL' => join " ", @paths);
+        if ($can_reproxy) {
+            $app->warn("If you want to get paths use GET /d/k?paths instead");
+        }
+        ## end deprecated
         $app->debug("request is HEAD, returning no content");
-        $res->header('Content-Length', 0);
         return $res;
     }
     my $handle = $client->read_file($key);
+    return $app->respond_not_found($req) unless $handle;
     $res->body($handle);
+    return $res;
+}
+
+sub get_paths {
+    my ($app, $req, $domain, $key) = @_;
+    my $res = $req->new_response(HTTP_OK);
+    $res->content_type('text/plain');
+    my $client = $app->get_client($domain);
+    my @paths = $client->get_paths($key, { no_verify => 1 });
+    my $paths = join "\n", @paths;
+    $res->header('Content-Length', length $paths);
+    if ($req->method ne 'HEAD') {
+        $res->body($paths);
+    }
     return $res;
 }
 

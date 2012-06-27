@@ -28,5 +28,5 @@ $ MOGILEFS_REST_SERVERS=localhost:7001 plackup -Ilib -a app.psgi
 # replace README with anyfile
 $ curl -i -X PUT --data-binary @README http://localhost:5000/testing/key
 $ curl -i -X GET http://localhost:5000/testing/key
-$ curl -i -X HEAD http://localhost:5000/testing/key
+$ curl -i -X GET http://localhost:5000/testing/key?paths=1
 $ curl -i -X DELETE http://localhost:5000/testing/key
