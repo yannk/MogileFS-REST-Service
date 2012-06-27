@@ -8,7 +8,7 @@ use Plack::Request;
 use Plack::Response;
 use Data::Dumper;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 ## set shortcut methods to log handler
 for my $lvl (qw/debug info warn error fatal/) {

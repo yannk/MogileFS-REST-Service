@@ -1,8 +1,9 @@
-MANIFEST
-MANIFEST.SKIP
+.gitignore
+app.psgi
+Changes
 lib/MogileFS/REST.pm
 lib/MogileFS/REST/DumbLogger.pm
-t/002_index_route.t
 Makefile.PL
-app.psgi
+MANIFEST
 README
+t/002_index_route.t

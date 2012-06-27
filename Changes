@@ -1,0 +1,3 @@
+0.2  Wed Jun 27 10:00:00 2012
+    - Add ?paths=1 to get the paths, rather than relying on Perlbal headers
+    - Remove Content-Length from HEAD requests
