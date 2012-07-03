@@ -8,7 +8,7 @@ use Plack::Request;
 use Plack::Response;
 use Data::Dumper;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 ## set shortcut methods to log handler
 for my $lvl (qw/debug info warn error fatal/) {
@@ -145,6 +145,7 @@ sub get_paths {
     $res->content_type('text/plain');
     my $client = $app->get_client($domain);
     my @paths = $client->get_paths($key, { no_verify => 1 });
+    return $app->respond_not_found($req) unless @paths;
     my $paths = join "\n", @paths;
     $res->header('Content-Length', length $paths);
     if ($req->method ne 'HEAD') {
