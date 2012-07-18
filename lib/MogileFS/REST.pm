@@ -31,7 +31,7 @@ sub new {
         require MogileFS::REST::DumbLogger;
         $app->{log} = MogileFS::REST::DumbLogger->new;
     }
-    $app->debug("Config: " . (Dumper $app));
+    $app->debug("Config: " . (Dumper { %$app, log => ref $app->{log} } ));
     return $app;
 }
 
