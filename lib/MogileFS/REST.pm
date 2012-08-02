@@ -8,7 +8,7 @@ use Plack::Request;
 use Plack::Response;
 use Data::Dumper;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 ## set shortcut methods to log handler
 for my $lvl (qw/debug info warn error fatal/) {
@@ -108,8 +108,14 @@ sub get {
     }
     my $client = $app->get_client($domain);
     my $res = $req->new_response(HTTP_OK);
+
+    ## so, where is this file?
+    my @paths = $client->get_paths($key, { no_verify => 1 });
+    unless (@paths) {
+        ## nowhere
+        return $req->new_response(HTTP_NOT_FOUND);
+    }
     if ($can_reproxy) {
-        my @paths = $client->get_paths($key, { no_verify => 1 });
         $res->header('X-Reproxy-URL' => join " ", @paths);
         ## we can reproxy, so just send headers without any body
         $app->debug("reproxying to " . $res->header('X-Reproxy-URL'));
@@ -121,10 +127,6 @@ sub get {
 
     if ($req->method eq 'HEAD') {
         ## deprecated. backward compat only
-        my @paths = $client->get_paths($key, { no_verify => 1 });
-        unless (@paths) {
-            return $req->new_response(HTTP_NOT_FOUND);
-        }
         $res->header('X-Reproxy-URL' => join " ", @paths);
         if ($can_reproxy) {
             $app->warn("If you want to get paths use GET /d/k?paths instead");
